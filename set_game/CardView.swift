@@ -9,10 +9,21 @@ import SwiftUI
 
 struct CardView: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        let base = RoundedRectangle(cornerRadius: 12)
+        
+        ZStack {
+            base.strokeBorder(.orange)
+            base.fill()
+        }
+        .foregroundStyle(.orange)
+        .aspectRatio(2/3, contentMode: .fill)
     }
 }
 
 #Preview {
-    CardView()
+    
+    LazyVGrid(columns: [GridItem(.adaptive(minimum: 85))]){
+        CardView()
+        CardView()
+    }.padding()
 }
