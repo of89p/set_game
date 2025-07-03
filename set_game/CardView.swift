@@ -21,9 +21,5 @@ struct CardView: View {
 }
 
 #Preview {
-    
-    LazyVGrid(columns: [GridItem(.adaptive(minimum: 85))]){
-        CardView()
-        CardView()
-    }.padding()
+    CardView()
 }
