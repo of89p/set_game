@@ -8,18 +8,60 @@
 import SwiftUI
 
 class SetGame_ViewModel: ObservableObject {
-    struct cardCategory<categoryType> {
-        var typeOne: categoryType
-        var typeTwo: categoryType
-        var typeThree: categoryType
+    @Published private var model: SetGame_Model<CardContent>
+        
+    struct CardContent {
+        var number: String
+        var shape: String
+        var shading:String
+        var color: String
     }
-
-    var typeOfCards: [String: Any] = [
-        "number": cardCategory<Int>(typeOne: 1, typeTwo: 2, typeThree: 3),
-        "shape": cardCategory<String>(typeOne: "diamond", typeTwo: "squiggle", typeThree: "oval"),
-        "shading": cardCategory<String>(typeOne: "solid", typeTwo: "stripped", typeThree: "open"),
-        "color": cardCategory<Color>(typeOne: Color.red, typeTwo: Color.green, typeThree: Color.purple)
-    ]
     
-    @Published private var model = SetGame_Model()
+    private(set) var allCardContents: [CardContent]
+    
+    init(){
+        allCardContents = []
+        
+        let typeOfCards = [
+            "number": ["1","2","3"],
+            "shape": ["diamond", "squiggle", "oval"],
+            "shading": ["solid", "stripped", "open"],
+            "color": ["red", "green", "purple"]
+        ]
+        
+        func generateCardContent(){
+            if let numbers = typeOfCards["number"],
+               let shapes = typeOfCards["shape"],
+               let shadings = typeOfCards["shading"],
+               let colors = typeOfCards["color"]
+            {
+                for number in numbers {
+                    for shape in shapes {
+                        for shading in shadings {
+                            for color in colors {
+                                allCardContents.append(CardContent(number: number, shape: shape, shading: shading, color: color))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        model = SetGame_ViewModel.createSetGame(numberOfCards: allCardContents.count, allCardContents: allCardContents)
+        
+        
+        generateCardContent()
+        
+        print("allCardContents \(allCardContents)")
+    }
+    
+    private static func createSetGame(numberOfCards: Int, allCardContents: [CardContent]) -> SetGame_Model<CardContent> {
+        return SetGame_Model<CardContent>(numberOfCards: allCardContents.count){ index in
+            return allCardContents[index]
+        }
+    }
+        
+   
 }
