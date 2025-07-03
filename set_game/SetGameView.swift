@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct SetGameView: View {
+    @ObservedObject var viewModel: SetGame_ViewModel
+    
     var body: some View {
         GeometryReader { geometry in
             let generatedMinimumSize = generateMinSize(
@@ -48,5 +50,5 @@ struct SetGameView: View {
 }
 
 #Preview {
-    SetGameView()
+    SetGameView(viewModel: SetGame_ViewModel())
 }
