@@ -23,10 +23,21 @@ struct CardView: View {
             VStack {
                 ForEach(0..<Int(number)!, id: \.self){ _ in
                     Spacer()
-                    Text("🙈")
+                    switch shape {
+                    case "diamond":
+                        Circle().strokeBorder(.black).fill()
+                    case "squiggle":
+                        Rectangle().strokeBorder(.black).fill()
+                    case "oval":
+                        Capsule().strokeBorder(.black).fill()
+                    default:
+                        Ellipse().strokeBorder(.black).fill()
+                    }
+                        
                     Spacer()
                 }
-            }.padding()
+                .foregroundStyle(displayColor())
+            }.padding().opacity(displayOpacity())
         }
         .foregroundStyle(.orange)
         .aspectRatio(2/3, contentMode: .fill)
@@ -37,10 +48,38 @@ struct CardView: View {
 //            
 //        }
 //    }
+    
+    func displayColor() -> Color {
+        let displayColor: Color
+        switch color {
+        case "red":
+            displayColor = Color.red
+        case "green":
+            displayColor = Color.green
+        case "purple":
+            displayColor = Color.purple
+        default:
+            displayColor = Color.black
+        }
+        return displayColor
+    }
+    
+    func displayOpacity() -> Double {
+        switch shading {
+        case "solid":
+             1
+        case "stripped":
+             0.5
+        case "open":
+             0
+        default:
+             0
+        }
+    }
 }
 
 #Preview {
-    CardView(number: "1", shape: "diamond", shading: "solid", color: "red")
+    CardView(number: "3", shape: "diamond", shading: "solid", color: "red")
 }
 //
 //static let typeOfCards = [
