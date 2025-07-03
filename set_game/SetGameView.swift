@@ -18,10 +18,13 @@ struct SetGameView: View {
                 aspectRatio: 2/3
             )
             
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: generatedMinimumSize))]){
-                CardView()
-                CardView()
-            }.padding()
+            ScrollView{
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: generatedMinimumSize))]){
+                    ForEach(viewModel.cards){ card in
+                        CardView(number: "1", shape: "diamond", shading: "solid", color: "red")
+                    }
+                }.padding()
+            }
         }
     }
     

@@ -24,6 +24,7 @@ struct SetGame_Model<CardContent>{
     struct Card: Identifiable {
         var isMatched = false
         var isSelected = false
+        var isInDeck = true
         var content: CardContent
         var id: Int
     }
