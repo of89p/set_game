@@ -32,7 +32,7 @@ class SetGame_ViewModel: ObservableObject {
     }
     
     static let typeOfCards = [
-        "number": ["1","2","3"],
+        "number": ["1", "2", "3"],
         "shape": ["diamond", "squiggle", "oval"],
         "shading": ["solid", "stripped", "open"],
         "color": ["red", "green", "purple"]
