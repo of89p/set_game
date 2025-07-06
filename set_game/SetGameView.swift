@@ -21,7 +21,7 @@ struct SetGameView: View {
             ScrollView{
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: generatedMinimumSize))]){
                     ForEach(viewModel.cards){ card in
-                        CardView(number: "1", shape: "diamond", shading: "solid", color: "red")
+                        CardView(card)
                     }
                 }.padding()
             }
