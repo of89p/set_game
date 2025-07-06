@@ -8,12 +8,30 @@
 import SwiftUI
 import CoreGraphics
 
-struct ShapeModifier: ViewModifier {
-    func applyShading(toShape: some Shape) -> some View {
-        
+struct ApplyShading: ViewModifier {
+    let opacityType: String
+    
+    func body(content: Content) -> some View {
+        Group {
+            content
+                .opacity(displayOpacity(opacityType: opacityType))
+        }
+    }
+    
+    func displayOpacity(opacityType: String) -> Double {
+        switch opacityType {
+        case "solid":
+             1
+        case "stripped":
+            0.5
+        default:
+             1
+        }
     }
 }
 
 extension View {
-    func
+    func applyShading(opacityType: String) -> some View {
+        modifier(ApplyShading(opacityType: opacityType))
+    }
 }
