@@ -10,13 +10,11 @@ import SwiftUI
 struct CardView: View {
     typealias Card = SetGame_Model<SetGame_ViewModel.CardContent>.Card
     let card: Card
-    let cardSize: CGSize
     let cardAspectRatio:CGFloat
     
-    init(_ card: Card, cardSize: CGSize){
+    init(_ card: Card){
         self.card = card
-        self.cardSize = cardSize
-        cardAspectRatio = (cardSize.width/cardSize.height)*3
+        cardAspectRatio = (2/3)*3
     }
     
     @ViewBuilder
