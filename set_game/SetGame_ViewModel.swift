@@ -7,15 +7,23 @@
 
 import SwiftUI
 
+
 class SetGame_ViewModel: ObservableObject {
     @Published private var model: SetGame_Model<CardContent>
         
-    struct CardContent {
+    struct CardContent: CardContentCompare {
+        var contentAsArray: [String]
+        
+//        static func compare(_ lhs: CardContent, _ rhs: CardContent) -> Bool {
+//            return false
+//        }
+        
         var number: String
         var shape: String
         var shading:String
         var color: String
     }
+    
     
     private(set) var allCardContents: [CardContent]
     
@@ -50,7 +58,8 @@ class SetGame_ViewModel: ObservableObject {
                 for shape in shapes {
                     for shading in shadings {
                         for color in colors {
-                            returnArr.append(CardContent(number: number, shape: shape, shading: shading, color: color))
+//                            returnArr.append(CardContent(number: number, shape: shape, shading: shading, color: color, makeArray: [number, shape, shading, color]))
+                            returnArr.append(CardContent(contentAsArray: [number, shape, shading, color], number: number, shape: shape, shading: shading, color: color))
                         }
                     }
                 }
@@ -61,7 +70,7 @@ class SetGame_ViewModel: ObservableObject {
     }
     
     var cards: Array<SetGame_Model<CardContent>.Card> {
-        return model.cards.filter({$0.whereIsTheCard == SetGame_Model.cardLocation.onTable})
+       return model.cards.filter({$0.whereIsTheCard == SetGame_Model.cardLocation.onTable})
     }
     
     func choose(_ card: SetGame_Model<CardContent>.Card){
