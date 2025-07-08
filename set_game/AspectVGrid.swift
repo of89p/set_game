@@ -20,14 +20,22 @@ struct AspectVGrid<Item: Identifiable, ItemView:View>: View {
                 aspectRatio: 2/3
             )
             
-            ScrollView{
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: generatedMinimumSize), spacing: 0)], spacing: 0){
-                    ForEach(items){ item in
-                        content(item)
-                            .aspectRatio(2/3, contentMode: .fit)
-                            .padding(5)
-                    }
+            if generatedMinimumSize < 70 {
+                ScrollView {
+                    returnActualContent(70)
                 }
+            } else {
+                returnActualContent(generatedMinimumSize)
+            }
+        }
+    }
+    
+    func returnActualContent(_ generatedMinimumSize: CGFloat) -> some View{
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: generatedMinimumSize), spacing: 0)], spacing: 0){
+            ForEach(items){ item in
+                content(item)
+                    .aspectRatio(2/3, contentMode: .fit)
+                    .padding(5)
             }
         }
     }
