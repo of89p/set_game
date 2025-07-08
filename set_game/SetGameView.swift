@@ -17,6 +17,7 @@ struct SetGameView: View {
                     viewModel.choose(card)
                 }
         }
+        .animation(.easeIn , value: viewModel.cards)
     }
 }
 
