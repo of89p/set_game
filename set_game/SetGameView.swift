@@ -31,7 +31,7 @@ struct SetGameView: View {
             }
         }.padding()
     }
-}
+}  
 
 #Preview {
     SetGameView(viewModel: SetGame_ViewModel())
