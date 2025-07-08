@@ -15,6 +15,7 @@ struct ApplyShading: ViewModifier {
         Group {
             content
                 .opacity(displayOpacity(opacityType: opacityType))
+//                .aspectRatio(2/1, contentMode:.fill)
         }
     }
     

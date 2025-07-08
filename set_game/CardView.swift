@@ -32,8 +32,8 @@ struct CardView: View {
                 
             }.padding()
         }
-        .foregroundStyle(.orange)
-        .aspectRatio(2/3, contentMode: .fill)
+        .foregroundStyle(card.isSelected ? .orange : .black)
+        .opacity(card.whereIsTheCard == SetGame_Model.cardLocation.inDeck ? 0 : 1)
     }
     
     
