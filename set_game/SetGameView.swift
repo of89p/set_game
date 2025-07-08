@@ -13,7 +13,10 @@ struct SetGameView: View {
     var body: some View {
         AspectVGrid(items: viewModel.cards, aspectRatio: 2/3) { card in
             CardView(card)
-        }.padding()
+                .onTapGesture {
+                    viewModel.choose(card)
+                }
+        }
     }
 }
 
