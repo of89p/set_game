@@ -16,14 +16,16 @@ struct AspectVGrid<Item: Identifiable, ItemView:View>: View {
         GeometryReader { geometry in
             let generatedMinimumSize = generateMinSize(
                 size: geometry.size,
-                numberOfCards: 12,
+                numberOfCards: Double(items.count),
                 aspectRatio: 2/3
             )
             
             ScrollView{
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: generatedMinimumSize))]){
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: generatedMinimumSize), spacing: 0)], spacing: 0){
                     ForEach(items){ item in
                         content(item)
+                            .aspectRatio(2/3, contentMode: .fit)
+                            .padding(5)
                     }
                 }
             }
@@ -36,16 +38,15 @@ struct AspectVGrid<Item: Identifiable, ItemView:View>: View {
         repeat {
             let width = size.width / columnTry
             let height = width / aspectRatio
-            let numberOfRows = (size.height / height).rounded(.up)
-            
+            let numberOfRows = (numberOfCards/columnTry).rounded(.up)
             if numberOfRows * height < size.height {
                 return width.rounded(.down)
             }
             
             columnTry += 1
-            
+    
         } while columnTry < numberOfCards
         
-        return 95
+        return 123
     }
 }
