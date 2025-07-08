@@ -16,6 +16,7 @@ struct SetGame_Model<CardContent: CardContentCompare> where CardContent: Equatab
     
     private(set) var cards: [Card]
     
+    
     init(numberOfCards: Int, cardContentFactory: (Int) -> CardContent){
         cards = []
         
@@ -25,7 +26,7 @@ struct SetGame_Model<CardContent: CardContentCompare> where CardContent: Equatab
         
         cards.shuffle()
         
-        for index in 0..<30 {
+        for index in 0..<12{
             cards[index].whereIsTheCard = cardLocation.onTable
         }
     }
@@ -45,31 +46,59 @@ struct SetGame_Model<CardContent: CardContentCompare> where CardContent: Equatab
         var id: Int
     }
     
+    mutating func addNewCards() -> Void {
+        let indicesOfCardsInDeck = cards.indices.filter({cards[$0].whereIsTheCard == cardLocation.inDeck})
+        if let cardIndexOfCardInSet = x() {
+            for index in 0..<cardIndexOfCardInSet.count {
+                cards[indicesOfCardsInDeck[index]].whereIsTheCard = cardLocation.onTable
+                let tempVar = cards[cardIndexOfCardInSet[index]]
+                cards[cardIndexOfCardInSet[index]] = cards[indicesOfCardsInDeck[index]]
+                cards[indicesOfCardsInDeck[index]] = tempVar
+            }
+        } else {
+            for index in 0..<max(0, 3){
+                cards[indicesOfCardsInDeck[index]].whereIsTheCard = cardLocation.onTable
+            }
+            
+        }
+    }
+    
     mutating func choose(_ card: Card){
         if let chosenCardIndex = cards.firstIndex(where: {$0.id == card.id}) {
+            x()
             cards[chosenCardIndex].isSelected.toggle()
-            let cardsSelectedIndex = cards.indices.filter{cards[$0].isSelected}
+        }
+    }
 
-            if cardsSelectedIndex.count == 3 {
-                let firstCard = cards[cardsSelectedIndex[0]].content.contentAsArray
-                let secondCard = cards[cardsSelectedIndex[1]].content.contentAsArray
-                let thirdCard = cards[cardsSelectedIndex[2]].content.contentAsArray
-                
-                let firstAndSecondComparison = compareTwoCards(firstCard, secondCard)
-                let secondAndThirdComparison = compareTwoCards(secondCard, thirdCard)
-                let firstAndThirdComparison = compareTwoCards(firstCard, thirdCard)
-                
-                print(firstAndSecondComparison, secondAndThirdComparison, firstAndThirdComparison, doTheyMatch(firstAndSecondComparison, secondAndThirdComparison, firstAndThirdComparison))
-                
-                if doTheyMatch(firstAndSecondComparison, secondAndThirdComparison, firstAndThirdComparison) {
-                    for index in 0..<3 {
-                        cards[cardsSelectedIndex[index]].isMatched = true
-                        cards[cardsSelectedIndex[index]].isSelected = false
-                        cards[cardsSelectedIndex[index]].whereIsTheCard = cardLocation.alreadyMatched
-                    }
+    mutating func x() -> [Int]? {
+//        var cardIndexOfCardInSet: [Int]?
+        let cardsSelectedIndex = cards.indices.filter{cards[$0].isSelected}
+        
+        if cardsSelectedIndex.count == 3 {
+            let firstCard = cards[cardsSelectedIndex[0]].content.contentAsArray
+            let secondCard = cards[cardsSelectedIndex[1]].content.contentAsArray
+            let thirdCard = cards[cardsSelectedIndex[2]].content.contentAsArray
+            
+            let firstAndSecondComparison = compareTwoCards(firstCard, secondCard)
+            let secondAndThirdComparison = compareTwoCards(secondCard, thirdCard)
+            let firstAndThirdComparison = compareTwoCards(firstCard, thirdCard)
+            
+//                print(firstAndSecondComparison, secondAndThirdComparison, firstAndThirdComparison, doTheyMatch(firstAndSecondComparison, secondAndThirdComparison, firstAndThirdComparison))
+            
+            if doTheyMatch(firstAndSecondComparison, secondAndThirdComparison, firstAndThirdComparison) {
+                for index in 0..<3 {
+                    cards[cardsSelectedIndex[index]].isMatched = true
+                    cards[cardsSelectedIndex[index]].isSelected = false
+                    cards[cardsSelectedIndex[index]].whereIsTheCard = cardLocation.alreadyMatched
+                }
+                return cardsSelectedIndex
+            } else {
+                for index in 0..<3 {
+                    cards[cardsSelectedIndex[index]].isSelected = false
                 }
             }
         }
+        return nil
     }
     
     func compareTwoCards(_ lhs: [String], _ rhs: [String]) -> [Bool] {

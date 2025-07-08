@@ -65,11 +65,19 @@ class SetGame_ViewModel: ObservableObject {
     }
     
     var cards: Array<SetGame_Model<CardContent>.Card> {
-       return model.cards.filter({$0.whereIsTheCard == SetGame_Model.cardLocation.onTable})
+        return model.cards.filter({$0.whereIsTheCard == SetGame_Model.cardLocation.onTable})
     }
     
     func choose(_ card: SetGame_Model<CardContent>.Card){
         model.choose(card)
+    }
+    
+    func addNewCards() -> Void {
+        model.addNewCards()
+    }
+    
+    var noCardsInDeck: Int {
+        return model.cards.filter({$0.whereIsTheCard == SetGame_Model.cardLocation.inDeck}).count
     }
    
 }
