@@ -18,6 +18,18 @@ struct SetGameView: View {
                 }
         }
         .animation(.easeIn , value: viewModel.cards)
+        HStack{
+            Button("Deal 3 more cards"){
+                viewModel.addNewCards()
+            }
+            .disabled(viewModel.noCardsInDeck==0)
+            
+            Spacer()
+            
+            Button("New game"){
+                viewModel.newGame()
+            }
+        }.padding()
     }
 }
 

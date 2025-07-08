@@ -37,10 +37,17 @@ struct SetGame_Model<CardContent: CardContentCompare> where CardContent: Equatab
         case alreadyMatched
     }
     
+    enum cardSelectionStatus{
+        case isSet
+        case notSet
+        case notChosen
+    }
+    
     
     struct Card: Equatable, Identifiable {
         var isMatched = false
         var isSelected = false
+        var selectedWrong = cardSelectionStatus.notChosen
         var whereIsTheCard = cardLocation.inDeck
         var content: CardContent
         var id: Int
@@ -65,13 +72,14 @@ struct SetGame_Model<CardContent: CardContentCompare> where CardContent: Equatab
     
     mutating func choose(_ card: Card){
         if let chosenCardIndex = cards.firstIndex(where: {$0.id == card.id}) {
-            x()
-            cards[chosenCardIndex].isSelected.toggle()
+            if cards[chosenCardIndex].selectedWrong == cardSelectionStatus.notChosen {
+                    cards[chosenCardIndex].isSelected.toggle()
+                    x()
+                }
         }
     }
 
     mutating func x() -> [Int]? {
-//        var cardIndexOfCardInSet: [Int]?
         let cardsSelectedIndex = cards.indices.filter{cards[$0].isSelected}
         
         if cardsSelectedIndex.count == 3 {
@@ -88,13 +96,30 @@ struct SetGame_Model<CardContent: CardContentCompare> where CardContent: Equatab
             if doTheyMatch(firstAndSecondComparison, secondAndThirdComparison, firstAndThirdComparison) {
                 for index in 0..<3 {
                     cards[cardsSelectedIndex[index]].isMatched = true
-                    cards[cardsSelectedIndex[index]].isSelected = false
-                    cards[cardsSelectedIndex[index]].whereIsTheCard = cardLocation.alreadyMatched
+                    cards[cardsSelectedIndex[index]].selectedWrong = cardSelectionStatus.isSet
+//                    cards[cardsSelectedIndex[index]].isSelected = false
+//                    cards[cardsSelectedIndex[index]].whereIsTheCard = cardLocation.alreadyMatched
                 }
                 return cardsSelectedIndex
             } else {
                 for index in 0..<3 {
-                    cards[cardsSelectedIndex[index]].isSelected = false
+                    cards[cardsSelectedIndex[index]].selectedWrong = cardSelectionStatus.notSet
+//                    cards[cardsSelectedIndex[index]].isSelected = false
+                }
+                return cardsSelectedIndex
+            }
+        } else if cardsSelectedIndex.count == 4 {
+            let firstThreeSelectedIndex = cards.indices.filter{cards[$0].selectedWrong != cardSelectionStatus.notChosen}
+            if cards[firstThreeSelectedIndex[0]].selectedWrong == cardSelectionStatus.isSet {
+                for index in 0..<3 {
+                    cards[firstThreeSelectedIndex[index]].whereIsTheCard = cardLocation.alreadyMatched
+                    cards[firstThreeSelectedIndex[index]].isSelected = false
+                    cards[firstThreeSelectedIndex[index]].selectedWrong = cardSelectionStatus.notChosen
+                }
+            } else if cards[firstThreeSelectedIndex[0]].selectedWrong == cardSelectionStatus.notSet{
+                for index in 0..<3 {
+                    cards[firstThreeSelectedIndex[index]].selectedWrong = cardSelectionStatus.notChosen
+                    cards[firstThreeSelectedIndex[index]].isSelected = false
                 }
             }
         }

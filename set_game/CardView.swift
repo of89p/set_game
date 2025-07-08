@@ -20,9 +20,16 @@ struct CardView: View {
     @ViewBuilder
     var body: some View {
         let base = RoundedRectangle(cornerRadius: 12)
+
         ZStack {
-            base.strokeBorder(.orange)
             base.fill()
+            
+            if card.selectedWrong == SetGame_Model.cardSelectionStatus.isSet {
+                base.strokeBorder(.green, lineWidth: 5)            }
+            else if card.selectedWrong == SetGame_Model.cardSelectionStatus.notSet {
+                base.strokeBorder(.red, lineWidth: 5)
+            }
+            
             VStack{
                 ForEach(0..<Int(card.content.number)!, id: \.self){_ in
                     Spacer()
@@ -30,7 +37,7 @@ struct CardView: View {
                     Spacer()
                 }
                 
-            }.padding()
+            }.padding(7)
         }
         .foregroundStyle(card.isSelected ? .orange : .black)
         .opacity(card.whereIsTheCard == SetGame_Model.cardLocation.inDeck ? 0 : 1)

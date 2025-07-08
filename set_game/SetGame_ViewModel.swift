@@ -76,6 +76,11 @@ class SetGame_ViewModel: ObservableObject {
         model.addNewCards()
     }
     
+    func newGame() {
+        allCardContents = SetGame_ViewModel.generateCardContent()
+        model = SetGame_ViewModel.createSetGame(numberOfCards: allCardContents.count, allCardContents: allCardContents)
+    }
+    
     var noCardsInDeck: Int {
         return model.cards.filter({$0.whereIsTheCard == SetGame_Model.cardLocation.inDeck}).count
     }
