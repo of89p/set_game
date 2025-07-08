@@ -11,13 +11,8 @@ import SwiftUI
 class SetGame_ViewModel: ObservableObject {
     @Published private var model: SetGame_Model<CardContent>
         
-    struct CardContent: CardContentCompare {
+    struct CardContent: CardContentCompare, Equatable {
         var contentAsArray: [String]
-        
-//        static func compare(_ lhs: CardContent, _ rhs: CardContent) -> Bool {
-//            return false
-//        }
-        
         var number: String
         var shape: String
         var shading:String

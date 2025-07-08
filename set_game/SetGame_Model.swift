@@ -11,7 +11,7 @@ protocol CardContentCompare {
     var contentAsArray: [String] {get}
 }
 
-struct SetGame_Model<CardContent: CardContentCompare>{
+struct SetGame_Model<CardContent: CardContentCompare> where CardContent: Equatable{
 
     
     private(set) var cards: [Card]
@@ -37,7 +37,7 @@ struct SetGame_Model<CardContent: CardContentCompare>{
     }
     
     
-    struct Card: Identifiable {
+    struct Card: Equatable, Identifiable {
         var isMatched = false
         var isSelected = false
         var whereIsTheCard = cardLocation.inDeck
@@ -48,7 +48,7 @@ struct SetGame_Model<CardContent: CardContentCompare>{
     mutating func choose(_ card: Card){
         if let chosenCardIndex = cards.firstIndex(where: {$0.id == card.id}) {
             cards[chosenCardIndex].isSelected.toggle()
-            var cardsSelectedIndex = cards.indices.filter{cards[$0].isSelected}
+            let cardsSelectedIndex = cards.indices.filter{cards[$0].isSelected}
 
             if cardsSelectedIndex.count == 3 {
                 let firstCard = cards[cardsSelectedIndex[0]].content.contentAsArray
@@ -62,12 +62,11 @@ struct SetGame_Model<CardContent: CardContentCompare>{
                 print(firstAndSecondComparison, secondAndThirdComparison, firstAndThirdComparison, doTheyMatch(firstAndSecondComparison, secondAndThirdComparison, firstAndThirdComparison))
                 
                 if doTheyMatch(firstAndSecondComparison, secondAndThirdComparison, firstAndThirdComparison) {
-                    cards[cardsSelectedIndex[0]].isMatched = true
-                    cards[cardsSelectedIndex[1]].isMatched = true
-                    cards[cardsSelectedIndex[2]].isMatched = true
-                    cards[cardsSelectedIndex[0]].whereIsTheCard = cardLocation.alreadyMatched
-                    cards[cardsSelectedIndex[1]].whereIsTheCard = cardLocation.alreadyMatched
-                    cards[cardsSelectedIndex[2]].whereIsTheCard = cardLocation.alreadyMatched
+                    for index in 0..<3 {
+                        cards[cardsSelectedIndex[index]].isMatched = true
+                        cards[cardsSelectedIndex[index]].isSelected = false
+                        cards[cardsSelectedIndex[index]].whereIsTheCard = cardLocation.alreadyMatched
+                    }
                 }
             }
         }
@@ -83,11 +82,5 @@ struct SetGame_Model<CardContent: CardContentCompare>{
     
     func doTheyMatch(_ firstComparison: [Bool], _ secondComparison: [Bool], _ thirdComparison: [Bool]) -> Bool{
         return firstComparison == secondComparison && secondComparison == thirdComparison
-//        for index in 0..<firstComparison.count {
-//            if firstComparison[index] == secondComparison[index] && secondComparison[index] == thirdComparison[index]{
-//                return false
-//            }
-//        }
-//        return true
     }
 }
