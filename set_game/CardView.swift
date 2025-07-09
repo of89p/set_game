@@ -24,9 +24,9 @@ struct CardView: View {
         ZStack {
             base.fill()
             
-            if card.selectedWrong == SetGame_Model.cardSelectionStatus.isSet {
+            if card.cardSelectionStatus == SetGame_Model.cardSelectionStatusOptions.selectedIsSet {
                 base.strokeBorder(.green, lineWidth: 5)            }
-            else if card.selectedWrong == SetGame_Model.cardSelectionStatus.notSet {
+            else if card.cardSelectionStatus == SetGame_Model.cardSelectionStatusOptions.selectedNotSet {
                 base.strokeBorder(.red, lineWidth: 5)
             }
             
@@ -39,7 +39,7 @@ struct CardView: View {
                 
             }.padding(7)
         }
-        .foregroundStyle(card.isSelected ? .orange : .black)
+        .foregroundStyle(card.cardSelectionStatus == SetGame_Model.cardSelectionStatusOptions.notSelected  ? .black : .orange)
         .opacity(card.whereIsTheCard == SetGame_Model.cardLocation.inDeck ? 0 : 1)
     }
     

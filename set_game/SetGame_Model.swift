@@ -37,95 +37,120 @@ struct SetGame_Model<CardContent: CardContentCompare> where CardContent: Equatab
         case alreadyMatched
     }
     
-    enum cardSelectionStatus{
-        case isSet
-        case notSet
-        case notChosen
+    enum cardSelectionStatusOptions{
+        case notSelected
+        case selected
+        case selectedNotSet
+        case selectedIsSet
     }
     
     
     struct Card: Equatable, Identifiable {
-        var isMatched = false
-        var isSelected = false
-        var selectedWrong = cardSelectionStatus.notChosen
+//        var isMatched = false
+//        var isSelected = false
+        var cardSelectionStatus = cardSelectionStatusOptions.notSelected
         var whereIsTheCard = cardLocation.inDeck
         var content: CardContent
         var id: Int
     }
     
     mutating func addNewCards() -> Void {
+        var needToDealMoreCards = true
         let indicesOfCardsInDeck = cards.indices.filter({cards[$0].whereIsTheCard == cardLocation.inDeck})
-        if let cardIndexOfCardInSet = x() {
-            for index in 0..<cardIndexOfCardInSet.count {
-                cards[indicesOfCardsInDeck[index]].whereIsTheCard = cardLocation.onTable
-                let tempVar = cards[cardIndexOfCardInSet[index]]
-                cards[cardIndexOfCardInSet[index]] = cards[indicesOfCardsInDeck[index]]
-                cards[indicesOfCardsInDeck[index]] = tempVar
-            }
-        } else {
+        
+        if numberOfCardsSelected() == 3 {
+            needToDealMoreCards = !dealWithThreePrevSelectedCards()
+        }
+        
+        if needToDealMoreCards {
             for index in 0..<max(0, 3){
                 cards[indicesOfCardsInDeck[index]].whereIsTheCard = cardLocation.onTable
             }
-            
         }
     }
     
     mutating func choose(_ card: Card){
         if let chosenCardIndex = cards.firstIndex(where: {$0.id == card.id}) {
-            if cards[chosenCardIndex].selectedWrong == cardSelectionStatus.notChosen {
-                    cards[chosenCardIndex].isSelected.toggle()
-                    x()
-                }
-        }
-    }
+            if cards[chosenCardIndex].cardSelectionStatus != cardSelectionStatusOptions.selectedIsSet && cards[chosenCardIndex].cardSelectionStatus !=  cardSelectionStatusOptions.selectedNotSet {
+                
+                toggleThisCard(cardIndex: chosenCardIndex)
+                
+                let arrOfSelectedCards = cards.indices.filter{cards[$0].cardSelectionStatus != cardSelectionStatusOptions.notSelected}
 
-    mutating func x() -> [Int]? {
-        let cardsSelectedIndex = cards.indices.filter{cards[$0].isSelected}
-        
-        if cardsSelectedIndex.count == 3 {
-            let firstCard = cards[cardsSelectedIndex[0]].content.contentAsArray
-            let secondCard = cards[cardsSelectedIndex[1]].content.contentAsArray
-            let thirdCard = cards[cardsSelectedIndex[2]].content.contentAsArray
-            
-            let firstAndSecondComparison = compareTwoCards(firstCard, secondCard)
-            let secondAndThirdComparison = compareTwoCards(secondCard, thirdCard)
-            let firstAndThirdComparison = compareTwoCards(firstCard, thirdCard)
-            
-//                print(firstAndSecondComparison, secondAndThirdComparison, firstAndThirdComparison, doTheyMatch(firstAndSecondComparison, secondAndThirdComparison, firstAndThirdComparison))
-            
-            if doTheyMatch(firstAndSecondComparison, secondAndThirdComparison, firstAndThirdComparison) {
-                for index in 0..<3 {
-                    cards[cardsSelectedIndex[index]].isMatched = true
-                    cards[cardsSelectedIndex[index]].selectedWrong = cardSelectionStatus.isSet
-//                    cards[cardsSelectedIndex[index]].isSelected = false
-//                    cards[cardsSelectedIndex[index]].whereIsTheCard = cardLocation.alreadyMatched
-                }
-                return cardsSelectedIndex
-            } else {
-                for index in 0..<3 {
-                    cards[cardsSelectedIndex[index]].selectedWrong = cardSelectionStatus.notSet
-//                    cards[cardsSelectedIndex[index]].isSelected = false
-                }
-                return cardsSelectedIndex
-            }
-        } else if cardsSelectedIndex.count == 4 {
-            let firstThreeSelectedIndex = cards.indices.filter{cards[$0].selectedWrong != cardSelectionStatus.notChosen}
-            if cards[firstThreeSelectedIndex[0]].selectedWrong == cardSelectionStatus.isSet {
-                for index in 0..<3 {
-                    cards[firstThreeSelectedIndex[index]].whereIsTheCard = cardLocation.alreadyMatched
-                    cards[firstThreeSelectedIndex[index]].isSelected = false
-                    cards[firstThreeSelectedIndex[index]].selectedWrong = cardSelectionStatus.notChosen
-                }
-            } else if cards[firstThreeSelectedIndex[0]].selectedWrong == cardSelectionStatus.notSet{
-                for index in 0..<3 {
-                    cards[firstThreeSelectedIndex[index]].selectedWrong = cardSelectionStatus.notChosen
-                    cards[firstThreeSelectedIndex[index]].isSelected = false
+                switch numberOfCardsSelected() {
+                case 3:
+                    let firstCard = cards[arrOfSelectedCards[0]].content.contentAsArray
+                    let secondCard = cards[arrOfSelectedCards[1]].content.contentAsArray
+                    let thirdCard = cards[arrOfSelectedCards[2]].content.contentAsArray
+                    
+                    let firstAndSecondComparison = compareTwoCards(firstCard, secondCard)
+                    let secondAndThirdComparison = compareTwoCards(secondCard, thirdCard)
+                    let firstAndThirdComparison = compareTwoCards(firstCard, thirdCard)
+                                        
+                    if doTheyMatch(firstAndSecondComparison, secondAndThirdComparison, firstAndThirdComparison) {
+                        for index in 0..<3 {
+                            cards[arrOfSelectedCards[index]].cardSelectionStatus = cardSelectionStatusOptions.selectedIsSet
+                        }
+                    } else {
+                        for index in 0..<3 {
+                            cards[arrOfSelectedCards[index]].cardSelectionStatus = cardSelectionStatusOptions.selectedNotSet
+                        }
+                    }
+                    
+                case 4:
+                    _ = dealWithThreePrevSelectedCards()
+//                    cards[arrOfSelectedCards[0]].cardSelectionStatus = cardSelectionStatusOptions.selected
+                default:
+                    break
                 }
             }
         }
-        return nil
     }
     
+    mutating func dealWithThreePrevSelectedCards() -> Bool {
+        var returnIsSetOrNot = false
+        
+        let indicesOfCardsInDeck = cards.indices.filter({cards[$0].whereIsTheCard == cardLocation.inDeck})
+        
+        // If set, replace matched card
+        let indicesOfCardsInSet = cards.indices.filter({cards[$0].cardSelectionStatus == cardSelectionStatusOptions.selectedIsSet})
+
+        if indicesOfCardsInSet.count == 3 {
+            for (i, index) in indicesOfCardsInSet.enumerated() {
+                cards[index].cardSelectionStatus = cardSelectionStatusOptions.notSelected
+                cards[index].whereIsTheCard = cardLocation.alreadyMatched
+                
+                if indicesOfCardsInDeck.count > 0{
+                    cards[indicesOfCardsInDeck[i]].whereIsTheCard = cardLocation.onTable
+                    let tempVar = cards[index]
+                    cards[index] = cards[indicesOfCardsInDeck[i]]
+                    cards[indicesOfCardsInDeck[i]] = tempVar
+                }
+            }
+            returnIsSetOrNot = true
+        }
+        
+        // By default set all cards to notSelected
+        let indicesOfCardsAlreadySelected = cards.indices.filter({cards[$0].cardSelectionStatus == cardSelectionStatusOptions.selectedIsSet || cards[$0].cardSelectionStatus == cardSelectionStatusOptions.selectedNotSet})
+        for index in indicesOfCardsAlreadySelected {
+            cards[index].cardSelectionStatus = cardSelectionStatusOptions.notSelected
+        }
+        
+        return returnIsSetOrNot
+    }
+    
+    mutating func toggleThisCard(cardIndex: Int){
+        if(cards[cardIndex].cardSelectionStatus == cardSelectionStatusOptions.notSelected) {
+            cards[cardIndex].cardSelectionStatus = cardSelectionStatusOptions.selected
+        } else {
+            cards[cardIndex].cardSelectionStatus = cardSelectionStatusOptions.notSelected
+        }
+    }
+    
+    func numberOfCardsSelected() -> Int {
+        cards.indices.filter{cards[$0].cardSelectionStatus != cardSelectionStatusOptions.notSelected}.count
+    }
+
     func compareTwoCards(_ lhs: [String], _ rhs: [String]) -> [Bool] {
         var returnArr: [Bool] = []
         for index in 0..<lhs.count {
@@ -138,3 +163,38 @@ struct SetGame_Model<CardContent: CardContentCompare> where CardContent: Equatab
         return firstComparison == secondComparison && secondComparison == thirdComparison
     }
 }
+
+
+
+
+
+
+
+
+
+
+// Card is selected
+// Changed cardSelectionStatus to ??? --> call determineCardSelectionStatus()
+// func determineCardSelectionStatus() --> numberOfCardsSelected()
+//       if third card
+                // check if they are a set --> use doTheyMatch()
+                // updated cardSelectionStatus to cardSelectionStatusOptions.selectedNotSet or cardSelectionStatusOptions.selectedIsSet accordingly
+//       if fourth card
+                // dealWithThreePrevSelectedCards()
+                // change 4th card to cardSelectionStatusOptions.selected
+//       if first or second card
+                // toggle cardSelectionStatus between cardSelectionStatusOptions.selected & cardSelectionStatusOptions.notSelected
+
+
+
+// Deal new cards button is selected
+// call numberOfCardsSelected()
+// dealWithThreePrevSelectedCards ()
+
+
+// func dealWithThreePrevSelectedCards()
+        // if set (check by filtering for cardSelectionStatusOptions.selectedIsSet == 3)
+                // change whereIsTheCard = cardLocation.alreadyMatched
+                // call replaceMatchedCards()
+        // by default: change all 3 prev cards cardSelectionStatus = cardSelectionStatusOptions.notSelected
+
